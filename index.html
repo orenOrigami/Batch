@@ -58,6 +58,7 @@
         console.log('Response Data:', responseData);
 
         if (responseData.body) {
+          // Check if the 'body' key contains the URL, and display the button
           resultDiv.innerHTML = `<button onclick="window.location.href='${responseData.body}'">Redirect to Batch</button>`;
         } else {
           resultDiv.innerHTML = 'Unexpected response format or no valid URL found.';

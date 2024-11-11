@@ -54,48 +54,19 @@
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        // Initially, the webhook might return an "Accepted" status or an empty response.
-        const responseData = await response.json();
-        console.log('Initial Response Data:', responseData);
+        // The response might be plain text (the URL), so we treat it as text
+        const responseText = await response.text();
+        console.log('Response Data:', responseText);
 
-        // If the response contains the "Accepted" message, wait for the actual response
-        if (responseData && responseData.status === 'Accepted') {
-          resultDiv.innerHTML = 'Request accepted, waiting for the final response...';
-
-          // Polling for the final result (this may need adjustment based on your system)
-          setTimeout(() => {
-            // Polling or re-fetching the webhook if needed
-            // This is just a simple placeholder to simulate a delay and retry process
-            // You may replace this with a proper polling mechanism or confirmation from the webhook
-            checkForFinalResponse();
-          }, 2000); // Check every 2 seconds (this is an example)
-        } else if (responseData.body) {
-          // If the webhook already responded with the final body containing the URL
-          resultDiv.innerHTML = `<button onclick="window.location.href='${responseData.body}'">Redirect to Batch</button>`;
+        // Check if the response is a valid URL
+        if (responseText && responseText.startsWith('http')) {
+          // If it's a valid URL, create a button to redirect the user
+          resultDiv.innerHTML = `<button onclick="window.location.href='${responseText}'">Redirect to Batch</button>`;
         } else {
           resultDiv.innerHTML = 'Unexpected response format or no valid URL found.';
         }
       } catch (error) {
         resultDiv.innerHTML = `Error contacting webhook: ${error.message}`;
-        console.error('Error:', error);
-      }
-    }
-
-    async function checkForFinalResponse() {
-      const resultDiv = document.getElementById('result');
-
-      try {
-        // Make another fetch request (or polling) to the webhook to get the final response
-        const finalResponse = await fetch('YOUR_FINAL_RESPONSE_URL'); // Adjust based on your system's logic
-        const finalResponseData = await finalResponse.json();
-
-        if (finalResponseData.body) {
-          resultDiv.innerHTML = `<button onclick="window.location.href='${finalResponseData.body}'">Redirect to Batch</button>`;
-        } else {
-          resultDiv.innerHTML = 'Final response did not contain the expected URL.';
-        }
-      } catch (error) {
-        resultDiv.innerHTML = `Error checking final response: ${error.message}`;
         console.error('Error:', error);
       }
     }

@@ -61,11 +61,11 @@
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        // Read the response as text (not JSON since it's a plain string in some cases)
+        // Read the response as text (to handle plain text responses like URLs)
         const responseText = await response.text();
         console.log('Webhook Response Text:', responseText);
 
-        // Handle the case when the response is a string like "Accepted"
+        // Handle plain text response for "Accepted"
         if (responseText === 'Accepted') {
           resultDiv.innerHTML = 'Request accepted, waiting for the final response...';
         } else if (responseText.startsWith('http')) {

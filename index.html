@@ -1,54 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Origami.ms Batch Search</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batch Search</title>
 </head>
 <body>
-    <h1>Search for a Batch</h1>
-    <input type="text" id="batchSearchInput" placeholder="Enter batch name or ID" />
-    <button id="searchButton">Search</button>
+  <h1>Batch Search</h1>
+  
+  <!-- Input Field and Search Button -->
+  <input type="text" id="searchQuery" placeholder="Enter search term">
+  <button onclick="search()">Search</button>
 
-    <div id="resultContainer"></div>
+  <div id="result"></div>
 
-    <script>
-        document.getElementById('searchButton').addEventListener('click', async function() {
-            const searchTerm = document.getElementById('batchSearchInput').value;
-            if (searchTerm.trim() === '') {
-                alert('Please enter a search term');
-                return;
-            }
+  <script>
+    async function search() {
+      const query = document.getElementById('searchQuery').value;
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = 'Searching...';
 
-            try {
-                const response = await fetch('https://api.origami.ms/v1/batches', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer YOUR_ORIGAMI_API_TOKEN',  // Replace with your API token
-                    },
-                });
+      if (!query) {
+        resultDiv.innerHTML = 'Please enter a search query.';
+        return;
+      }
 
-                const data = await response.json();
-                const batch = data.find(batch => batch.name.includes(searchTerm) || batch.id.includes(searchTerm));
+      try {
+        // Replace with your webhook URL
+        const webhookURL = 'https://your-webhook-url.com/webhook';
 
-                if (batch) {
-                    displayResult(batch);
-                } else {
-                    document.getElementById('resultContainer').innerHTML = 'No batches found.';
-                }
-            } catch (error) {
-                console.error('Error fetching batches:', error);
-                document.getElementById('resultContainer').innerHTML = 'Error searching for batches.';
-            }
+        // Send the search request to the webhook
+        const response = await fetch(webhookURL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ searchQuery: query })
         });
 
-        function displayResult(batch) {
-            const resultContainer = document.getElementById('resultContainer');
-            resultContainer.innerHTML = `
-                <p>Batch Found: ${batch.name}</p>
-                <button onclick="window.location.href='https://origami.ms/batch/${batch.id}'">Go to Batch</button>
-            `;
+        // Parse the JSON response
+        const data = await response.json();
+
+        if (data.batchUrl) {
+          resultDiv.innerHTML = `<a href="${data.batchUrl}" target="_blank">Redirect to Batch</a>`;
+        } else {
+          resultDiv.innerHTML = 'No batches found.';
         }
-    </script>
+      } catch (error) {
+        resultDiv.innerHTML = 'Error contacting webhook.';
+        console.error(error);
+      }
+    }
+  </script>
 </body>
 </html>

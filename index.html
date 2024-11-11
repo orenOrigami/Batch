@@ -17,6 +17,12 @@
       font-size: 16px;
       cursor: pointer;
     }
+    a {
+      display: inline-block;
+      margin-top: 10px;
+      color: blue;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -64,7 +70,11 @@
           resultDiv.innerHTML = 'Request accepted, waiting for the final response...';
         } else if (responseData.body && responseData.body.startsWith('http')) {
           // If the response contains a valid URL in the "body" key, create a button to redirect the user
-          resultDiv.innerHTML = `<button onclick="window.location.href='${responseData.body}'">Redirect to Batch</button>`;
+          resultDiv.innerHTML = `
+            <button onclick="window.location.href='${responseData.body}'">Redirect to Batch</button>
+            <br>
+            <a href="${responseData.body}" target="_blank">Open Batch URL</a>
+          `;
         } else {
           resultDiv.innerHTML = 'Unexpected response format or no valid URL found.';
         }

@@ -7,7 +7,7 @@
 </head>
 <body>
   <h1>Batch Search</h1>
-  
+
   <!-- Input Field and Search Button -->
   <input type="text" id="searchQuery" placeholder="Enter search term">
   <button onclick="sendDataToWebhook()">Search</button>
@@ -31,16 +31,15 @@
 
         // Send the search request to the webhook
         const response = await fetch(webhookURL, {
-          method: 'POST', // HTTP method
+          method: 'POST',
           headers: {
-            'Content-Type': 'application/json' // Set content type to JSON
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            searchQuery: query // Send the search term as JSON
+            searchQuery: query
           })
         });
 
-        // Log the response status for debugging
         console.log('Response Status:', response.status);
 
         // Check if the response is successful (status 200)
@@ -48,15 +47,13 @@
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        // Parse the response from the webhook
-        const data = await response.json();
+        // Parse the response as plain text
+        const text = await response.text();
+        console.log('Raw response:', text);
 
-        // Log the response data to check if the link is returned
-        console.log('Webhook response:', data);
-
-        // Check if the response contains a link and display it as a button
-        if (data.batchUrl) {
-          resultDiv.innerHTML = `<button onclick="window.location.href='${data.batchUrl}'">Redirect to Batch</button>`;
+        // Check if the response contains a URL and display it as a button
+        if (text) {
+          resultDiv.innerHTML = `<button onclick="window.location.href='${text.trim()}'">Redirect to Batch</button>`;
         } else {
           resultDiv.innerHTML = 'No batches found.';
         }

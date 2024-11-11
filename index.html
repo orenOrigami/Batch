@@ -10,15 +10,15 @@
   
   <!-- Input Field and Search Button -->
   <input type="text" id="searchQuery" placeholder="Enter search term">
-  <button onclick="search()">Search</button>
+  <button onclick="sendDataToWebhook()">Search</button>
 
   <div id="result"></div>
 
   <script>
-    async function search() {
+    async function sendDataToWebhook() {
       const query = document.getElementById('searchQuery').value;
       const resultDiv = document.getElementById('result');
-      resultDiv.innerHTML = 'Searching...';
+      resultDiv.innerHTML = 'Sending request...';
 
       if (!query) {
         resultDiv.innerHTML = 'Please enter a search query.';
@@ -26,21 +26,24 @@
       }
 
       try {
-        // Replace with your webhook URL
-        const webhookURL = 'https://your-webhook-url.com/webhook';
+        // Webhook URL
+        const webhookURL = 'https://hook.eu2.make.com/iwj2tdngzc2i54k2l1z68xxthusblt2r';
 
         // Send the search request to the webhook
         const response = await fetch(webhookURL, {
-          method: 'POST',
+          method: 'POST', // HTTP method
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json' // Set content type to JSON
           },
-          body: JSON.stringify({ searchQuery: query })
+          body: JSON.stringify({
+            searchQuery: query // Send the search term as JSON
+          })
         });
 
-        // Parse the JSON response
+        // Parse the response from the webhook
         const data = await response.json();
 
+        // Handle the response (assuming the webhook returns a batchUrl)
         if (data.batchUrl) {
           resultDiv.innerHTML = `<a href="${data.batchUrl}" target="_blank">Redirect to Batch</a>`;
         } else {

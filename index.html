@@ -40,8 +40,21 @@
           })
         });
 
+        // Log the request and response for debugging
+        console.log('Request sent to webhook:', {
+          method: 'POST',
+          url: webhookURL,
+          body: JSON.stringify({ searchQuery: query }),
+        });
+
+        // Check if the response is successful
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
         // Parse the response from the webhook
         const data = await response.json();
+        console.log('Webhook response:', data);
 
         // Handle the response (assuming the webhook returns a batchUrl)
         if (data.batchUrl) {
@@ -51,7 +64,7 @@
         }
       } catch (error) {
         resultDiv.innerHTML = 'Error contacting webhook.';
-        console.error(error);
+        console.error('Error:', error);
       }
     }
   </script>

@@ -40,13 +40,6 @@
           })
         });
 
-        // Log the request and response for debugging
-        console.log('Request sent to webhook:', {
-          method: 'POST',
-          url: webhookURL,
-          body: JSON.stringify({ searchQuery: query }),
-        });
-
         // Check if the response is successful
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -54,11 +47,13 @@
 
         // Parse the response from the webhook
         const data = await response.json();
+
+        // Log the response to check if the link is returned
         console.log('Webhook response:', data);
 
-        // Handle the response (assuming the webhook returns a batchUrl)
+        // Check if the response contains a link and display it as a button
         if (data.batchUrl) {
-          resultDiv.innerHTML = `<a href="${data.batchUrl}" target="_blank">Redirect to Batch</a>`;
+          resultDiv.innerHTML = `<button onclick="window.location.href='${data.batchUrl}'">Redirect to Batch</button>`;
         } else {
           resultDiv.innerHTML = 'No batches found.';
         }

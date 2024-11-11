@@ -1,56 +1,72 @@
-<script>
-  async function sendDataToWebhook() {
-    const query = document.getElementById('searchQuery').value;
-    const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = 'Sending request...';
-
-    if (!query) {
-      resultDiv.innerHTML = 'Please enter a search query.';
-      return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batch Search</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
     }
+    #result {
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Batch Search</h1>
+  <label for="searchQuery">Enter Search Query:</label>
+  <input type="text" id="searchQuery" placeholder="Search...">
+  <button onclick="sendDataToWebhook()">Search</button>
 
-    try {
-      // Initial webhook request
-      const webhookURL = 'https://hook.eu2.make.com/iwj2tdngzc2i54k2l1z68xxthusblt2r';
-      const response = await fetch(webhookURL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          searchQuery: query
-        })
-      });
+  <div id="result"></div>
 
-      console.log('Initial Response Status:', response.status);
+  <script>
+    async function sendDataToWebhook() {
+      const query = document.getElementById('searchQuery').value;
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = 'Sending request...';
 
-      if (response.status === 202 || response.ok) {
-        resultDiv.innerHTML = 'Request accepted, waiting for response...';
+      if (!query) {
+        resultDiv.innerHTML = 'Please enter a search query.';
+        return;
+      }
 
-        // Polling loop
-        let finalResponse;
-        for (let i = 0; i < 10; i++) { // Poll up to 10 times
-          await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds
-          
-          // Replace with actual endpoint to check status or get the result
-          finalResponse = await fetch(webhookURL + '/status'); 
-          const text = await finalResponse.text();
+      try {
+        const webhookURL = 'https://hook.eu2.make.com/iwj2tdngzc2i54k2l1z68xxthusblt2r';
+        const response = await fetch(webhookURL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            searchQuery: query
+          })
+        });
 
-          console.log(`Polling attempt ${i + 1}:`, text);
-
-          if (finalResponse.ok && text.startsWith('http')) {
-            resultDiv.innerHTML = `<button onclick="window.location.href='${text.trim()}'">Redirect to Batch</button>`;
-            return;
-          }
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        resultDiv.innerHTML = 'Final response not received in time. Try again later.';
-      } else {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        const responseData = await response.json();
+        console.log('Response Data:', responseData);
+
+        if (responseData.body) {
+          resultDiv.innerHTML = `<button onclick="window.location.href='${responseData.body}'">Redirect to Batch</button>`;
+        } else {
+          resultDiv.innerHTML = 'Unexpected response format or no valid URL found.';
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `Error contacting webhook: ${error.message}`;
+        console.error('Error:', error);
       }
-    } catch (error) {
-      resultDiv.innerHTML = `Error contacting webhook: ${error.message}`;
-      console.error('Error:', error);
     }
-  }
-</script>
+  </script>
+</body>
+</html>

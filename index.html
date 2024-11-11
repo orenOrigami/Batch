@@ -50,18 +50,21 @@
           })
         });
 
+        // Check if the response is OK
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        // The response might be plain text (the URL), so we treat it as text
-        const responseText = await response.text();
-        console.log('Response Data:', responseText);
+        // Read the response as JSON
+        const responseData = await response.json();
+        console.log('Webhook Response Data:', responseData);
 
-        // Check if the response is a valid URL
-        if (responseText && responseText.startsWith('http')) {
-          // If it's a valid URL, create a button to redirect the user
-          resultDiv.innerHTML = `<button onclick="window.location.href='${responseText}'">Redirect to Batch</button>`;
+        // Handle the case when the response is "Accepted"
+        if (responseData === 'Accepted') {
+          resultDiv.innerHTML = 'Request accepted, waiting for the final response...';
+        } else if (responseData.body && responseData.body.startsWith('http')) {
+          // If the response contains a valid URL in the "body" key, create a button to redirect the user
+          resultDiv.innerHTML = `<button onclick="window.location.href='${responseData.body}'">Redirect to Batch</button>`;
         } else {
           resultDiv.innerHTML = 'Unexpected response format or no valid URL found.';
         }

@@ -40,7 +40,10 @@
           })
         });
 
-        // Check if the response is successful
+        // Log the response status for debugging
+        console.log('Response Status:', response.status);
+
+        // Check if the response is successful (status 200)
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -48,7 +51,7 @@
         // Parse the response from the webhook
         const data = await response.json();
 
-        // Log the response to check if the link is returned
+        // Log the response data to check if the link is returned
         console.log('Webhook response:', data);
 
         // Check if the response contains a link and display it as a button
@@ -58,7 +61,7 @@
           resultDiv.innerHTML = 'No batches found.';
         }
       } catch (error) {
-        resultDiv.innerHTML = 'Error contacting webhook.';
+        resultDiv.innerHTML = `Error contacting webhook: ${error.message}`;
         console.error('Error:', error);
       }
     }

@@ -51,11 +51,11 @@
         const text = await response.text();
         console.log('Raw response:', text);
 
-        // Check if the response contains a URL and display it as a button
-        if (text) {
+        // If the response contains a valid URL, display it as a button
+        if (text.startsWith('http')) {
           resultDiv.innerHTML = `<button onclick="window.location.href='${text.trim()}'">Redirect to Batch</button>`;
         } else {
-          resultDiv.innerHTML = 'No batches found.';
+          resultDiv.innerHTML = 'Unexpected response format or no valid URL found.';
         }
       } catch (error) {
         resultDiv.innerHTML = `Error contacting webhook: ${error.message}`;

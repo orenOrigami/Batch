@@ -90,16 +90,14 @@
 
                 const responseText = await response.text(); // Get raw response as text
 
-                // Check if the response is plain text (e.g., "Accepted")
+                // If the response is the plain text "Accepted"
                 if (responseText === 'Accepted') {
                     alert('Search request accepted, waiting for results...');
                     await waitForFinalResult(serialInput);  // Wait for the real response
                 } else {
-                    // Try to parse the response as JSON
-                    let data;
+                    // Check if the response is an array or unexpected
                     try {
-                        // Parse the response as a JSON array
-                        data = JSON.parse(responseText); // Try parsing as JSON
+                        let data = JSON.parse(responseText); // Try parsing as JSON
                         handleFinalResult(data);
                     } catch (error) {
                         console.error('Error parsing response as JSON:', error);

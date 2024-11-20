@@ -1,88 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Batch Search</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    #result {
-      margin-top: 20px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    a {
-      display: inline-block;
-      margin-top: 10px;
-      color: blue;
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BATCH Not Found</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        .yes-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .no-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        input {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Batch Search</h1>
-  <label for="searchQuery">Enter Search Query:</label>
-  <input type="text" id="searchQuery" placeholder="Search...">
-  <button onclick="sendDataToWebhook()">Search</button>
+    <h1>BATCH Not Found</h1>
+    <p>Would you like to create a new BATCH?</p>
+    
+    <!-- Input field for the serial searched -->
+    <input type="text" id="serialInput" placeholder="Enter serial number" />
 
-  <div id="result"></div>
+    <br />
+    <button class="yes-btn" onclick="sendResponse()">Yes</button>
+    <button class="no-btn" onclick="goToSearchPage()">No</button>
 
-  <script>
-    async function sendDataToWebhook() {
-      const query = document.getElementById('searchQuery').value;
-      const resultDiv = document.getElementById('result');
-      resultDiv.innerHTML = 'Sending request...';
+    <script>
+        // Function to send 'yes' response and the serial to the webhook
+        function sendResponse() {
+            const webhookUrl = 'https://hook.eu2.make.com/iwj2tdngzc2i54k2l1z68xxthusblt2r'; // Replace with your webhook URL
+            const serialInput = document.getElementById('serialInput').value;
 
-      if (!query) {
-        resultDiv.innerHTML = 'Please enter a search query.';
-        return;
-      }
+            if (!serialInput) {
+                alert('Please enter a serial number before proceeding.');
+                return;
+            }
 
-      try {
-        const webhookURL = 'https://hook.eu2.make.com/iwj2tdngzc2i54k2l1z68xxthusblt2r';
-        const response = await fetch(webhookURL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            searchQuery: query
-          })
-        });
+            const payload = {
+                action: 'yes',
+                serial: serialInput
+            };
 
-        // Check if the response is OK
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                alert('Response sent successfully.');
+                // Optionally, redirect to a success page or show a message
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to send response. Please try again.');
+            });
         }
 
-        // Read the response as text (to handle plain text responses like URLs)
-        const responseText = await response.text();
-        console.log('Webhook Response Text:', responseText);
-
-        // Handle plain text response for "Accepted"
-        if (responseText === 'Accepted') {
-          resultDiv.innerHTML = 'Request accepted, waiting for the final response...';
-        } else if (responseText.startsWith('http')) {
-          // If the response is a URL, display the redirect button and link
-          resultDiv.innerHTML = `
-            <button onclick="window.location.href='${responseText}'">Redirect to Batch</button>
-            <br>
-            <a href="${responseText}" target="_blank">Open Batch URL</a>
-          `;
-        } else {
-          resultDiv.innerHTML = 'Unexpected response format or no valid URL found.';
+        // Function to redirect to the search page
+        function goToSearchPage() {
+            window.location.href = '/Batch'; // Replace with your actual search page URL
         }
-      } catch (error) {
-        resultDiv.innerHTML = `Error contacting webhook: ${error.message}`;
-        console.error('Error:', error);
-      }
-    }
-  </script>
+    </script>
 </body>
 </html>

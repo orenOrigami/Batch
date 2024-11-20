@@ -88,26 +88,22 @@
                     throw new Error(`Search request failed with status ${response.status}`);
                 }
 
-                // Attempt to parse the response as JSON
-                let data;
-                try {
-                    data = await response.json();  // Try parsing as JSON
-                } catch (error) {
-                    // If JSON parsing fails, log the raw response and alert the user
-                    const text = await response.text();  // Get the raw response body
-                    console.error('Error parsing response:', error, text);
-                    alert('Error: The response is not valid JSON: ' + text);
-                    return;
-                }
+                const responseText = await response.text(); // Get raw response as text
 
-                console.log('Search response:', data);
-
-                // If response is 'Accepted', we should wait for the real result
-                if (data.status === 'Accepted') {
+                // Check if the response is plain text (e.g., "Accepted")
+                if (responseText === 'Accepted') {
                     alert('Search request accepted, waiting for results...');
                     await waitForFinalResult(serialInput);  // Wait for the real response
                 } else {
-                    handleFinalResult(data);
+                    // Try to parse the response as JSON
+                    let data;
+                    try {
+                        data = JSON.parse(responseText); // Try parsing as JSON
+                        handleFinalResult(data);
+                    } catch (error) {
+                        console.error('Error parsing response as JSON:', error);
+                        alert('Error: The response is not valid JSON.');
+                    }
                 }
             } catch (error) {
                 console.error('Search error:', error);
@@ -137,10 +133,23 @@
                         throw new Error(`Final status request failed with status ${finalResponse.status}`);
                     }
 
-                    const finalData = await finalResponse.json();
-                    console.log('Final response:', finalData);
+                    const finalResponseText = await finalResponse.text(); // Get raw response
 
-                    handleFinalResult(finalData);
+                    // Check if the response is plain text (e.g., "Accepted")
+                    if (finalResponseText === 'Accepted') {
+                        alert('Search request accepted, still waiting for results...');
+                        return;
+                    }
+
+                    // Try to parse the final response as JSON
+                    let finalData;
+                    try {
+                        finalData = JSON.parse(finalResponseText);
+                        handleFinalResult(finalData);
+                    } catch (error) {
+                        console.error('Error parsing final response as JSON:', error);
+                        alert('Error: The response is not valid JSON.');
+                    }
                 }, 2000);  // Wait for 2 seconds before checking the status again
             } catch (error) {
                 console.error('Error waiting for final result:', error);

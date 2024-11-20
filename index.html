@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BATCH Not Found</title>
+    <title>BATCH Search</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -65,13 +65,18 @@
                 return;
             }
 
+            const payload = {
+                action: 'search',
+                serial: serialInput
+            };
+
             try {
                 const response = await fetch(webhookUrlSearch, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ serial: serialInput }),
+                    body: JSON.stringify(payload),
                 });
 
                 if (!response.ok) {
@@ -98,13 +103,18 @@
         async function sendYes() {
             const serialInput = document.getElementById('serialInput').value;
 
+            const payload = {
+                action: 'yes',
+                serial: serialInput
+            };
+
             try {
                 const response = await fetch(webhookUrlYes, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ action: 'yes', serial: serialInput }),
+                    body: JSON.stringify(payload),
                 });
 
                 if (!response.ok) {

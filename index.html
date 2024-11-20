@@ -51,6 +51,11 @@
         <button class="yes-btn" onclick="sendYes()">Yes</button>
         <button class="no-btn" onclick="goToSearchPage()">No</button>
     </div>
+    
+    <div id="foundMessage" style="display: none; margin-top: 20px;">
+        <h2>BATCH Found!</h2>
+        <p>Proceeding to BATCH details...</p>
+    </div>
 
     <script>
         const webhookUrlSearch = 'https://hook.eu2.make.com/iwj2tdngzc2i54k2l1z68xxthusblt2r'; // Replace with your search webhook URL
@@ -86,12 +91,14 @@
                 const data = await response.json();
                 console.log('Search response:', data);
 
-                // Show next step buttons only if BATCH not found
                 if (data.status === 'not_found') {
+                    // Show the "BATCH Not Found" options
                     document.getElementById('responseButtons').style.display = 'block';
+                } else if (data.status === 'found') {
+                    // Show "BATCH Found" message
+                    document.getElementById('foundMessage').style.display = 'block';
                 } else {
-                    alert('BATCH found. Proceeding to details...');
-                    // Redirect or handle found BATCH
+                    alert('Unexpected response. Please try again.');
                 }
             } catch (error) {
                 console.error('Search error:', error);
@@ -132,7 +139,8 @@
 
         // Step 3: Handle "No" button click
         function goToSearchPage() {
-            window.location.href = '/search'; // Replace with your actual search page URL
+            alert('Returning to search page...');
+            window.location.reload();
         }
     </script>
 </body>

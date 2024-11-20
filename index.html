@@ -98,6 +98,7 @@
                     // Try to parse the response as JSON
                     let data;
                     try {
+                        // Parse the response as a JSON array
                         data = JSON.parse(responseText); // Try parsing as JSON
                         handleFinalResult(data);
                     } catch (error) {
@@ -159,7 +160,7 @@
 
         // Step 3: Handle the final result after the search is completed
         function handleFinalResult(data) {
-            if (data.status === 'not_found') {
+            if (Array.isArray(data) && data.length > 0 && data[0].body === 'לא נמצא BATCH, האם ליצור חדש?') {
                 // Show the "BATCH Not Found" options
                 document.getElementById('responseButtons').style.display = 'block';
             } else if (data.status === 'found') {
